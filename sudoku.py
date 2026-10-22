@@ -1,25 +1,11 @@
-# Basic Sudoku helpers: the CSP model, reading puzzle files and printing grids.
-#
-# CSP view of the puzzle:
-#   variables   - the 81 cells, stored as (row, col) with 0-based indices
-#   domains     - {1..9} for an empty cell, {d} for a cell given as d
-#   constraints - every cell must be different from its 20 peers
-#                 (the other cells in its row, column and 3x3 box)
-
 import os
-
-
-class PuzzleError(Exception):
-    """Raised when a puzzle file can't be read or has the wrong format."""
-
-
 CELLS = [(r, c) for r in range(9) for c in range(9)]
 
 rows = [[(r, c) for c in range(9)] for r in range(9)]
 cols = [[(r, c) for r in range(9)] for c in range(9)]
 boxes = [[(br + i, bc + j) for i in range(3) for j in range(3)]
          for br in (0, 3, 6) for bc in (0, 3, 6)]
-units = rows + cols + boxes 
+UNITS = rows + cols + boxes 
 
 def find_peers(r, c):
     peers = set()
@@ -34,43 +20,41 @@ def find_peers(r, c):
     peers.remove((r, c))
     return sorted(peers)
 
-
 PEERS = {cell: find_peers(*cell) for cell in CELLS}
 
-
 def load_puzzle(path):
-    """Read a 9x9 grid from a .txt file (values separated by spaces).
-    Empty cells are written as 0. Returns a list of 9 lists of ints."""
+    """
+        Read puzzle from a txt file.
+        Empty cells are written as 0. Returns a list of 9 lists of ints.
+    """
     ext = os.path.splitext(path)[1].lower()
     if ext != ".txt":
-        raise PuzzleError(f"unsupported file type '{ext}', use .txt")
+        raise ValueError(f"unsupported file type '{ext}', use .txt")
     with open(path) as f:
         return parse_puzzle(f.read())
 
-
 def parse_puzzle(text):
-    """Same as load_puzzle but works on the file's text (used for uploaded files)."""
+    """load a puzzle and create a 9x9 grid of ints (0 = empty)"""
     lines = [line.strip() for line in text.splitlines() if line.strip()]
 
     if len(lines) != 9:
-        raise PuzzleError(f"expected 9 rows but found {len(lines)}")
+        raise ValueError(f"expected 9 rows but found {len(lines)}")
 
     grid = []
     for row_no, line in enumerate(lines, start=1):
         values = [v.strip() for v in line.split()]
         if len(values) != 9:
-            raise PuzzleError(f"row {row_no} has {len(values)} values, expected 9")
+            raise ValueError(f"row {row_no} has {len(values)} values, expected 9")
         row = []
         for v in values:
             if len(v) != 1 or not v.isdigit():
-                raise PuzzleError(f"row {row_no} has an invalid value '{v}'")
+                raise ValueError(f"row {row_no} has an invalid value '{v}'")
             row.append(int(v))
         grid.append(row)
     return grid
 
-
 def find_clash(grid):
-    """If two given digits already break a rule, describe the clash. Otherwise None."""
+    """check if the grid has any clashes (two of the same digit in a row, column, or box)"""
     for (r, c) in CELLS:
         d = grid[r][c]
         if d == 0:
@@ -80,9 +64,8 @@ def find_clash(grid):
                 return f"{d} appears twice (row {r+1} col {c+1} and row {pr+1} col {pc+1})"
     return None
 
-
 def is_solution(grid, puzzle=None):
-    """True if grid is a complete valid Sudoku (and keeps the clues of puzzle, if given)."""
+    """check if grid is a complete valid Sudoku."""
     for unit in UNITS:
         if sorted(grid[r][c] for r, c in unit) != list(range(1, 10)):
             return False
@@ -91,7 +74,6 @@ def is_solution(grid, puzzle=None):
             if puzzle[r][c] and puzzle[r][c] != grid[r][c]:
                 return False
     return True
-
 
 def format_grid(grid):
     line = "+-------+-------+-------+"
@@ -107,7 +89,6 @@ def format_grid(grid):
         if r % 3 == 2:
             out.append(line)
     return "\n".join(out)
-
 
 def count_clues(grid):
     return sum(1 for r, c in CELLS if grid[r][c])

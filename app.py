@@ -2,7 +2,7 @@
 import pandas as pd
 import streamlit as st
 
-from sudoku import parse_puzzle, count_clues, find_clash, PuzzleError
+from sudoku import parse_puzzle, count_clues, find_clash
 from solvers import solve_mrv_fc, solve_backtracking
 
 METHODS = {
@@ -79,7 +79,7 @@ with left:
         st.session_state.file_id = uploaded.file_id
         try:
             set_puzzle(parse_puzzle(uploaded.getvalue().decode("utf-8")), uploaded.name)
-        except (PuzzleError, UnicodeDecodeError) as e:
+        except ValueError as e:
             set_puzzle(None, error=f"Could not read {uploaded.name}: {e}")
 
     puzzle = st.session_state.puzzle
@@ -89,9 +89,9 @@ with left:
     if puzzle is not None:
         st.markdown(board_html(puzzle), unsafe_allow_html=True)
         st.write(f"**{st.session_state.name}**, {count_clues(puzzle)} clues")
-        # clash = find_clash(puzzle)
-        # if clash:
-        #     st.warning("The clues break the rules: " + clash)
+        clash = find_clash(puzzle)
+        if clash:
+            st.warning("The clues break the rules: " + clash)
 
     method = st.radio("Method", list(METHODS), horizontal=True)
     b1, b2 = st.columns(2)
@@ -111,8 +111,6 @@ if compare_clicked:
                          "Time (s)": round(res.seconds, 4),
                          "Nodes": res.nodes, "Backtracks": res.backtracks})
     st.session_state.comparison = rows
-
-
 
 # output column
 with right:

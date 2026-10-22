@@ -3,7 +3,7 @@
 import glob
 import unittest
 
-from sudoku import load_puzzle, parse_puzzle, is_solution, PuzzleError
+from sudoku import load_puzzle, parse_puzzle, is_solution
 from solvers import solve_backtracking, solve_mrv_fc
 
 SOLVABLE = [
@@ -33,7 +33,7 @@ class TestReading(unittest.TestCase):
         for path in ["puzzles/invalid/only_8_rows.txt",
                      "puzzles/invalid/letter_in_grid.txt",
                      "puzzles/invalid/wrong_extension.dat"]:
-            with self.assertRaises(PuzzleError):
+            with self.assertRaises(ValueError):
                 load_puzzle(path)
 
 

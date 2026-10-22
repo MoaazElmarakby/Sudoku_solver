@@ -6,7 +6,7 @@
 import argparse
 import sys
 
-from sudoku import load_puzzle, format_grid, count_clues, PuzzleError
+from sudoku import load_puzzle, format_grid, count_clues
 from solvers import SOLVERS
 
 
@@ -21,7 +21,7 @@ def main():
 
     try:
         puzzle = load_puzzle(args.file)
-    except (PuzzleError, OSError) as e:
+    except (ValueError, OSError) as e:
         print(f"Could not read {args.file}: {e}")
         sys.exit(1)
 

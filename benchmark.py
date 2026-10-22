@@ -9,7 +9,7 @@ import glob
 import os
 import statistics
 
-from sudoku import load_puzzle, count_clues, is_solution, PuzzleError
+from sudoku import load_puzzle, count_clues, is_solution
 from solvers import solve_backtracking, solve_mrv_fc
 
 REPEATS = 5                   # time is the median of this many runs
@@ -45,7 +45,7 @@ def main():
     for path in files:
         try:
             puzzle = load_puzzle(path)
-        except PuzzleError as e:
+        except ValueError as e:
             print(f"skipping {path}: {e}")
             continue
         name = os.path.splitext(os.path.basename(path))[0]
