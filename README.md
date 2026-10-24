@@ -64,3 +64,7 @@ The benchmark measures three things:
 - **Nodes:** Number of times the solver tries finding a number in each cell.
 - **Backtracks:** Number of times the solver removes a number because it leads to a invalid solution.
 - **Time:** How long the solver takes to finish.
+
+## References :
+
+[Solving Every Sudoku Puzzle](https://www.norvig.com/sudoku.html)
