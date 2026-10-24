@@ -59,10 +59,8 @@ def main():
         writer.writeheader()
         writer.writerows(rows)
     print("\nsaved", csv_path)
-
     # make charts for time, nodes, and backtracks
     make_charts(rows)
-
 
 def make_charts(rows):
     # one chart per measurement, with a pair of bars (one per method) for each puzzle
@@ -90,7 +88,6 @@ def make_charts(rows):
         plt.title(f"{title} per puzzle")
         plt.legend()
         plt.tight_layout()
-
         out = os.path.join(Output_dir, f"{title}.png")
         plt.savefig(out)
         plt.close()
