@@ -23,7 +23,7 @@ pip install -r requirements.txt
 | `app.py` | Implements the GUI using Streamlit|
 | `benchmark.py` | Tests both methods and saves the results |
 | `test_solver.py` | Implements the unit tests |
-| `puzzles/` | Directory contains test puzzles The puzzels are generated using AI tool |
+| `puzzles/` | Directory contains test puzzles. The txt puzzel files are generated using AI tool |
 
 ## How to Run
 
