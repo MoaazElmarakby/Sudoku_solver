@@ -1,56 +1,66 @@
 # Sudoku Solver
 
-Solves 9x9 Sudoku puzzles using backtracking search with the MRV heuristic and
-forward checking. Plain backtracking is included as a baseline for comparison.
+This a project to solve 9x9 sudoku puzzles using backtracking methods. There are 2 different algorithms
+basic backtracking and backtracking with MRV + forward checking. It includes evaluation for each algorithm and comparison between them. In addition to that UI application.
 
-Needs Python 3.9+. The web interface uses Streamlit, and the charts in
-`benchmark.py` use matplotlib:
+## Requirements
 
-```
+Python 3.9 or later is required.
+Streamlit is required to the GUI.
+
+```bash
 pip install -r requirements.txt
 ```
 
-The solvers and the command line program need nothing beyond the standard library.
 
 ## Files
 
-| File | What it does |
+| File | Description |
 |---|---|
-| `sudoku.py` | CSP model (cells, peers), reading `.txt` files, checking and printing grids |
-| `solvers.py` | `solve_backtracking` (baseline) and `solve_mrv_fc` (main solver) |
-| `main.py` | command line program |
-| `app.py` | web interface (Streamlit) |
-| `benchmark.py` | runs both solvers on every puzzle, writes `results/` |
-| `test_solver.py` | unit tests |
-| `puzzles/` | test puzzles; `puzzles/invalid/` has broken files for testing errors |
+| `sudoku.py` | Reads puzzle files, check the puzzle valid or not and prints them |
+| `solvers.py` | Implements the solvers algorithms |
+| `main.py` | Runs the pipeline, loads the files and solve the puzzles |
+| `app.py` | Implements the GUI using Streamlit|
+| `benchmark.py` | Tests both methods and saves the results |
+| `test_solver.py` | Implements the unit tests |
+| `puzzles/` | Directory contains test puzzles The puzzels are generated using AI tool |
 
-## Running it
+## How to Run
 
-```
+Run the solver on a puzzle:
+```bash
 python main.py puzzles/06_extreme_inkala.txt
+```
+
+Use basic backtracking:
+```bash
 python main.py puzzles/04_hard.txt --solver backtracking
+```
+
+Start the web interface:
+```bash
 streamlit run app.py
+```
+
+Run the benchmark:
+```bash
 python benchmark.py
+```
+
+Run the unit tests:
+```bash
 python -m unittest test_solver -v
 ```
 
-`streamlit run app.py` opens the interface in your browser (http://localhost:8501).
-Upload a puzzle file, choose a method and press Solve.
-"Compare both methods" runs both solvers on the same puzzle.
+The web interface opens at [http://localhost:8501](http://localhost:8501). 
+Upload a puzzle
+select a solving method, and click **Solve**.
 
-## Puzzle format
 
-9 lines, 9 values per line, separated by spaces.
-Use 0 for an empty cell.
+## Performance Metrics
 
-```
-0 0 3 0 2 0 6 0 0
-9 0 0 3 0 5 0 0 1
-...
-```
+The benchmark measures three things:
 
-## Metrics
-
-- **nodes**: number of times a digit was placed in a cell
-- **backtracks**: number of times a placed digit had to be removed again
-- **time**: `time.perf_counter()` around the search, median of 5 runs in the benchmark
+- **Nodes:** Number of times the solver tries finding a number in each cell.
+- **Backtracks:** Number of times the solver removes a number because it leads to a invalid solution.
+- **Time:** How long the solver takes to finish.

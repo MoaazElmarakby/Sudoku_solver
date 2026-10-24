@@ -11,40 +11,65 @@ METHODS = {
 }
 NODE_LIMIT = 2000000   # stops plain backtracking from running for ages
 
+
 BOARD_CSS = """
 <style>
-table.sudoku { border-collapse: collapse; margin: 4px 0 12px 0; border: 3px solid #222; }
-table.sudoku td { width: 40px; height: 40px; text-align: center; font-size: 21px;
-                  border: 1px solid #b5b5b5; background: #fff; padding: 0; }
-table.sudoku td.clue { font-weight: 700; color: #111; }
-table.sudoku td.solved { color: #1d5fbf; }
-table.sudoku td.right { border-right: 3px solid #222; }
-table.sudoku td.bottom { border-bottom: 3px solid #222; }
+.sudoku {
+    border-collapse: collapse;
+    border: 3px solid black;
+}
+
+.sudoku td {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 21px;
+    border: 1px solid #ccc;
+    padding: 0;
+}
+
+.clue {
+    font-weight: bold;
+    color: black;
+}
+
+.solved {
+    color: blue;
+}
+
+.right {
+    border-right: 3px solid black !important;
+}
+
+.bottom {
+    border-bottom: 3px solid black !important;
+}
 </style>
 """
 
+
 def board_html(puzzle, solution=None):
+    # generate HTML for a Sudoku board and with a solution
     rows = []
     for r in range(9):
-        cells = []
+        row = ""
         for c in range(9):
-            classes = []
-            if puzzle[r][c]:
-                digit = puzzle[r][c]
-                classes.append("clue")
+            value = puzzle[r][c]
+            css_class = ""
+            if value:
+                css_class = "clue"
             elif solution:
-                digit = solution[r][c]
-                classes.append("solved")
+                value = solution[r][c]
+                css_class = "solved"
             else:
-                digit = ""
-            if c in (2, 5):
-                classes.append("right")
-            if r in (2, 5):
-                classes.append("bottom")
-            cells.append(f'<td class="{" ".join(classes)}">{digit}</td>')
-        rows.append("<tr>" + "".join(cells) + "</tr>")
+                value = ""
+            if c == 2 or c == 5:
+                css_class += " right"
+            if r == 2 or r == 5:
+                css_class += " bottom"
+            row += f'<td class="{css_class.strip()}">{value}</td>'
+        rows.append(f"<tr>{row}</tr>")
     return BOARD_CSS + '<table class="sudoku">' + "".join(rows) + "</table>"
-
 
 def set_puzzle(grid, name=None, error=None):
     st.session_state.puzzle = grid
@@ -52,7 +77,6 @@ def set_puzzle(grid, name=None, error=None):
     st.session_state.load_error = error
     st.session_state.result = None
     st.session_state.comparison = None
-
 
 st.set_page_config(page_title="Sudoku Solver", layout="wide")
 
