@@ -15,10 +15,8 @@ class Result:
         return (f"{self.method}: {self.status} in {self.seconds:.4f} s, "
                 f"{self.nodes} nodes, {self.backtracks} backtracks")
 
-
 class _LimitReached(Exception):
     pass
-
 
 def solve_backtracking(puzzle, max_nodes=None):
     # backtracking search, trying the digits 1 to 9 in order for each empty cell.
