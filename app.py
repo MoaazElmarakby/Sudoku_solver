@@ -11,7 +11,6 @@ METHODS = {
 }
 NODE_LIMIT = 2000000   # stops plain backtracking from running for ages
 
-
 BOARD_CSS = """
 <style>
 .sudoku {
@@ -20,6 +19,8 @@ BOARD_CSS = """
 }
 
 .sudoku td {
+    background: white;
+    color: black;
     width: 40px;
     height: 40px;
     text-align: center;
@@ -46,7 +47,6 @@ BOARD_CSS = """
 }
 </style>
 """
-
 
 def board_html(puzzle, solution=None):
     # generate HTML for a Sudoku board and with a solution
@@ -88,7 +88,6 @@ st.title("Sudoku Solver")
 
 # split window into two columns, left for input, right for output
 left, right = st.columns(2, gap="large")
-
 
 # input column
 with left:

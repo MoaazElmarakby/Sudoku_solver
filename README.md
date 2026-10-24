@@ -23,7 +23,20 @@ pip install -r requirements.txt
 | `app.py` | Implements the GUI using Streamlit|
 | `benchmark.py` | Tests both methods and saves the results |
 | `test_solver.py` | Implements the unit tests |
-| `puzzles/` | Directory contains test puzzles. The txt puzzel files are generated using AI tool |
+| `puzzles/` | Directory contains test puzzles. It is AI generated depending on the following resources
+
+### Puzzle Sources
+
+| Puzzle | Source |
+|---|---|
+| 01 | Simple easy example |
+| 02 | Example from Wikipedia's Sudoku page |
+| 03, 04 | AI generated |
+| 05 | From Norvig's essay |
+| 06 | Arto Inkala's "world's hardest" puzzle |
+| 07 | Wikipedia puzzle designed to defeat backtracking |
+| 08 | Puzzle 06 with one wrong digit added (AI generated), making it unsolvable |
+| 09 | Empty grid |
 
 ## How to Run
 

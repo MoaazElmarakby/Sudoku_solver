@@ -78,7 +78,7 @@ def make_charts(rows):
                 for r in rows:
                     if r["puzzle"] == p and r["method"] == method:
                         # log scale can't show 0, so use a tiny value instead
-                        values.append(max(r[key], 0.1))
+                        values.append(max(r[key], 1e-5 if key == "time_s" else 0.1))
             x = [j + i * width for j in range(len(puzzles))]
             plt.bar(x, values, width, label=method)
 
@@ -92,7 +92,6 @@ def make_charts(rows):
         plt.savefig(out)
         plt.close()
         print("saved", out)
-
 
 if __name__ == "__main__":
     main()
