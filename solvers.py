@@ -1,24 +1,10 @@
-# Two search-based solvers that share the same CSP model (see sudoku.py):
-#
-#   solve_backtracking - plain chronological backtracking, cells filled left to
-#                        right, top to bottom. Used as the baseline.
-#   solve_mrv_fc       - backtracking + MRV variable ordering + forward checking.
-#                        This is the main solver.
-#
-# Both count the same things so the results can be compared directly:
-#   nodes      - number of times a digit was placed in a cell
-#   backtracks - number of times a placed digit had to be taken out again
-#   seconds    - wall-clock time of the search (time.perf_counter)
-
 import time
-
 from sudoku import CELLS, PEERS, find_clash
-
 
 class Result:
     def __init__(self, method):
         self.method = method
-        self.status = ""        # "solved", "no solution" or "gave up"
+        self.status = ""
         self.solution = None
         self.nodes = 0
         self.backtracks = 0
@@ -35,11 +21,11 @@ class _LimitReached(Exception):
 
 
 def solve_backtracking(puzzle, max_nodes=None):
-    """Plain backtracking: fill the empty cells in a fixed order, checking each
-    digit against the cells already filled."""
+    # backtracking search, trying the digits 1 to 9 in order for each empty cell.
     res = Result("Backtracking")
     grid = [row[:] for row in puzzle]
 
+    #check if there is a clash in the initial puzzle
     clash = find_clash(grid)
     if clash:
         res.status = "no solution"
@@ -67,7 +53,7 @@ def solve_backtracking(puzzle, max_nodes=None):
             grid[r][c] = d
             if search(i + 1):
                 return True
-            # dead end further down, undo and try the next digit
+            # no solution found, backtrack
             grid[r][c] = 0
             res.backtracks += 1
         return False
@@ -77,6 +63,7 @@ def solve_backtracking(puzzle, max_nodes=None):
         found = search(0)
         res.status = "solved" if found else "no solution"
     except _LimitReached:
+        # limit reached, give up and return the partial solution
         found = False
         res.status = "gave up"
         res.message = f"stopped after {max_nodes} nodes"
@@ -88,13 +75,12 @@ def solve_backtracking(puzzle, max_nodes=None):
 
 
 def solve_mrv_fc(puzzle, max_nodes=None):
-    """Backtracking with MRV (pick the empty cell with the fewest values left)
-    and forward checking (after placing d, remove d from the domains of the
-    empty peers and backtrack straight away if one of them becomes empty)."""
+    # backtracking search with MRV + forward checking
     res = Result("MRV + forward checking")
     grid = [row[:] for row in puzzle]
 
     clash = find_clash(grid)
+    # check if there is a clash in the initial puzzle
     if clash:
         res.status = "no solution"
         res.message = "the given digits break the rules: " + clash
@@ -113,18 +99,18 @@ def solve_mrv_fc(puzzle, max_nodes=None):
             domains[cell] = set(range(1, 10)) - used
 
     def pick_cell():
-        # MRV - the empty cell with the smallest domain (first one wins ties)
+        # pick the empty cell with the fewest remaining values (MRV)
         best = None
         for (r, c) in CELLS:
             if grid[r][c] == 0:
                 if best is None or len(domains[(r, c)]) < len(domains[best]):
                     best = (r, c)
                     if len(domains[best]) <= 1:
-                        break   # can't do better than this
+                        break   # nothing can be better than 1, so stop searching
         return best
 
     def assign(cell, d):
-        # place d and prune it from the empty peers; remember what was removed
+        # assign digit d to cell, and remove d from the domains of its peers
         r, c = cell
         grid[r][c] = d
         removed = []
@@ -133,7 +119,7 @@ def solve_mrv_fc(puzzle, max_nodes=None):
                 domains[p].remove(d)
                 removed.append(p)
                 if not domains[p]:
-                    return removed, False   # a peer has no values left
+                    return removed, False   # no values left for a peer
         return removed, True
 
     def unassign(cell, d, removed):
@@ -158,11 +144,13 @@ def solve_mrv_fc(puzzle, max_nodes=None):
 
     try:
         if any(not domains[(r, c)] for r, c in CELLS if grid[r][c] == 0):
-            found = False   # some empty cell has no possible digit at all
+            found = False   # empty cell with no possible values, so no solution
         else:
             found = search()
         res.status = "solved" if found else "no solution"
     except _LimitReached:
+
+        # limit reached, give up and return the partial solution
         found = False
         res.status = "gave up"
         res.message = f"stopped after {max_nodes} nodes"

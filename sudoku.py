@@ -8,6 +8,7 @@ boxes = [[(br + i, bc + j) for i in range(3) for j in range(3)]
 UNITS = rows + cols + boxes 
 
 def find_peers(r, c):
+    """return a sorted list of the 20 peers of cell (r, c)"""
     peers = set()
     for i in range(9):
         peers.add((r, i))

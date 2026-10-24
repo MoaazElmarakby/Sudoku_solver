@@ -1,54 +1,48 @@
-# Runs both solvers on every puzzle in puzzles/ and records time, nodes and
-# backtracks. Results go to results/results.csv, plus a few bar charts if
-# matplotlib is installed.
-#
-#   python benchmark.py
-
 import csv
 import glob
 import os
 import statistics
-
+import matplotlib.pyplot as plt
 from sudoku import load_puzzle, count_clues, is_solution
 from solvers import solve_backtracking, solve_mrv_fc
 
-REPEATS = 5                   # time is the median of this many runs
-BACKTRACKING_LIMIT = 20000000  # plain backtracking gives up after this many nodes
-OUT_DIR = "results"
+repeats = 5 # time is the median of this many runs
+Run_limit = 20000000    # plain backtracking gives up after this many nodes
+Output_dir = "results"
 
 METHODS = [
     ("Backtracking", solve_backtracking),
     ("MRV + FC", solve_mrv_fc),
 ]
-
-
+# run a solver on a puzzle multiple times and return the first result and the median time
 def run(solver, puzzle):
     times = []
     first = None
-    for i in range(REPEATS):
-        res = solver(puzzle, max_nodes=BACKTRACKING_LIMIT)
+    for i in range(repeats):
+        res = solver(puzzle, max_nodes=Run_limit)
         times.append(res.seconds)
         if first is None:
             first = res
         if res.status == "gave up" or res.seconds > 5:
-            break   # long runs are only done once, the noise is small anyway
-    # nodes and backtracks are the same on every run, only time varies
+            break  
     return first, statistics.median(times)
 
-
 def main():
+    #load all the puzzles in the puzzles directory and run each solver on each puzzle
     files = sorted(glob.glob("puzzles/*.txt"))
-    os.makedirs(OUT_DIR, exist_ok=True)
+    os.makedirs(Output_dir, exist_ok=True)
     rows = []
 
     print(f"{'puzzle':28} {'clues':>5}  {'method':13} {'status':12} {'time (s)':>10} {'nodes':>10} {'backtracks':>11}")
     for path in files:
         try:
+            # load the puzzle from the given file
             puzzle = load_puzzle(path)
         except ValueError as e:
             print(f"skipping {path}: {e}")
             continue
         name = os.path.splitext(os.path.basename(path))[0]
+        # choose the solver based on the method name and run it on the puzzle
         for method, solver in METHODS:
             res, t = run(solver, puzzle)
             if res.status == "solved":
@@ -58,61 +52,48 @@ def main():
                          "status": res.status, "time_s": round(t, 6),
                          "nodes": res.nodes, "backtracks": res.backtracks})
 
-    csv_path = os.path.join(OUT_DIR, "results.csv")
+    # save the results to a CSV file and make charts
+    csv_path = os.path.join(Output_dir, "results.csv")
     with open(csv_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=list(rows[0]))
         writer.writeheader()
         writer.writerows(rows)
     print("\nsaved", csv_path)
 
-    try:
-        make_charts(rows)
-    except ImportError:
-        print("matplotlib not installed, skipping charts")
+    # make charts for time, nodes, and backtracks
+    make_charts(rows)
 
 
 def make_charts(rows):
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
+    # one chart per measurement, with a pair of bars (one per method) for each puzzle
     puzzles = []
     for r in rows:
         if r["puzzle"] not in puzzles:
             puzzles.append(r["puzzle"])
-    colours = {"Backtracking": "#eb6834", "MRV + FC": "#2a78d6"}
 
-    for key, label in [("time_s", "Time (seconds)"), ("nodes", "Nodes (digits placed)"),
-                       ("backtracks", "Backtracks")]:
-        fig, ax = plt.subplots(figsize=(9, 4.5))
-        width = 0.38
+    for key, title in [("time_s", "time"), ("nodes", "nodes"), ("backtracks", "backtracks")]:
+        plt.figure(figsize=(10, 5))
+        width = 0.4
         for i, (method, _) in enumerate(METHODS):
-            values, stopped = [], []
+            values = []
             for p in puzzles:
-                r = next(x for x in rows if x["puzzle"] == p and x["method"] == method)
-                values.append(max(r[key], 1e-5 if key == "time_s" else 0.8))  # log scale can't show 0
-                stopped.append(r["status"] == "gave up")
-            xs = [j + (i - 0.5) * width for j in range(len(puzzles))]
-            bars = ax.bar(xs, values, width - 0.03, label=method, color=colours[method])
-            for bar, s in zip(bars, stopped):
-                if s:
-                    bar.set_hatch("//")
-                    ax.annotate("limit hit", (bar.get_x() + bar.get_width() / 2, bar.get_height()),
-                                ha="center", va="bottom", fontsize=8, color="#444444")
-        ax.set_yscale("log")
-        ax.set_ylabel(label + ", log scale")
-        ax.set_xticks(range(len(puzzles)))
-        ax.set_xticklabels([p.replace("_", " ", 1).replace("_", "\n") for p in puzzles], fontsize=8)
-        ax.grid(axis="y", color="#dddddd", linewidth=0.6)
-        ax.set_axisbelow(True)
-        for side in ("top", "right"):
-            ax.spines[side].set_visible(False)
-        ax.legend(frameon=False)
-        ax.set_title(f"{label.split(' (')[0]} per puzzle: plain backtracking vs MRV + forward checking", fontsize=11)
-        fig.tight_layout()
-        out = os.path.join(OUT_DIR, f"{key.replace('_s', '')}.png")
-        fig.savefig(out, dpi=150)
-        plt.close(fig)
+                for r in rows:
+                    if r["puzzle"] == p and r["method"] == method:
+                        # log scale can't show 0, so use a tiny value instead
+                        values.append(max(r[key], 0.1))
+            x = [j + i * width for j in range(len(puzzles))]
+            plt.bar(x, values, width, label=method)
+
+        plt.yscale("log")
+        plt.xticks([j + width / 2 for j in range(len(puzzles))], puzzles, rotation=45, ha="right")
+        plt.ylabel(title)
+        plt.title(f"{title} per puzzle")
+        plt.legend()
+        plt.tight_layout()
+
+        out = os.path.join(Output_dir, f"{title}.png")
+        plt.savefig(out)
+        plt.close()
         print("saved", out)
 
 

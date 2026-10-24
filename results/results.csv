@@ -1,19 +1,19 @@
 puzzle,clues,method,status,time_s,nodes,backtracks
-01_easy,32,Backtracking,solved,0.000404,200,151
-01_easy,32,MRV + FC,solved,0.000229,49,0
-02_easy,30,Backtracking,solved,0.010253,4208,4157
-02_easy,30,MRV + FC,solved,0.000219,51,0
-03_medium,30,Backtracking,solved,0.000378,193,142
-03_medium,30,MRV + FC,solved,0.000227,51,0
-04_hard,25,Backtracking,solved,0.026197,12002,11946
-04_hard,25,MRV + FC,solved,0.008321,2371,2315
-05_hard_17_clues,17,Backtracking,solved,21.951048,9727396,9727332
-05_hard_17_clues,17,MRV + FC,solved,0.002093,481,417
-06_extreme_inkala,21,Backtracking,solved,0.109632,49558,49498
-06_extreme_inkala,21,MRV + FC,solved,0.042728,10101,10041
-07_anti_backtracking,17,Backtracking,gave up,43.720404,20000000,19999969
-07_anti_backtracking,17,MRV + FC,solved,0.189653,45267,45203
-08_unsolvable,22,Backtracking,no solution,1.248582,565218,565218
-08_unsolvable,22,MRV + FC,no solution,0.072683,18152,18152
-09_empty_grid,0,Backtracking,solved,0.000801,391,310
-09_empty_grid,0,MRV + FC,solved,0.000557,81,0
+01_easy,32,Backtracking,solved,0.000428,200,151
+01_easy,32,MRV + FC,solved,0.000217,49,0
+02_easy,30,Backtracking,solved,0.009878,4208,4157
+02_easy,30,MRV + FC,solved,0.000231,51,0
+03_medium,30,Backtracking,solved,0.000418,193,142
+03_medium,30,MRV + FC,solved,0.000232,51,0
+04_hard,25,Backtracking,solved,0.028125,12002,11946
+04_hard,25,MRV + FC,solved,0.007449,2371,2315
+05_hard_17_clues,17,Backtracking,solved,23.248681,9727396,9727332
+05_hard_17_clues,17,MRV + FC,solved,0.001917,481,417
+06_extreme_inkala,21,Backtracking,solved,0.118181,49558,49498
+06_extreme_inkala,21,MRV + FC,solved,0.037874,10101,10041
+07_anti_backtracking,17,Backtracking,gave up,47.011001,20000000,19999969
+07_anti_backtracking,17,MRV + FC,solved,0.174747,45267,45203
+08_unsolvable,22,Backtracking,no solution,1.331464,565218,565218
+08_unsolvable,22,MRV + FC,no solution,0.064154,18152,18152
+09_empty_grid,0,Backtracking,solved,0.000792,391,310
+09_empty_grid,0,MRV + FC,solved,0.000522,81,0
